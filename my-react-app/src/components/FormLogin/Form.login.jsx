@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import {useDispatch} from "react-redux";
+import { login } from "../../redux/authSlice";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../services/firebaseConfig";
 import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
@@ -8,6 +10,7 @@ const db = getFirestore();
 
 const LoginForm = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -16,7 +19,6 @@ const LoginForm = () => {
         e.preventDefault();
 
         try {
-            // Buscar el email asociado al username en Firestore
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("username", "==", username));
             const querySnapshot = await getDocs(q);
@@ -29,9 +31,14 @@ const LoginForm = () => {
             const userDoc = querySnapshot.docs[0];
             const email = userDoc.data().email;
 
-            // Iniciar sesión con el email encontrado
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+
+            dispatch(login({
+                uid: user.uid,
+                email: user.email,
+                username: username,
+            }));
 
             alert("Inicio de sesión exitoso");
             navigate("/home");

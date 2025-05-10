@@ -10,6 +10,7 @@ const RegisterForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [birthdate, setBirthdate] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const navigate = useNavigate();
 
@@ -24,6 +25,7 @@ const RegisterForm = () => {
                 username: username,
                 email: email,
                 birthdate: birthdate,
+                profileComplete: false,
             });
 
             console.log("Usuario registrado y datos guardados en Firestore:", user);
@@ -31,7 +33,7 @@ const RegisterForm = () => {
             navigate("/");
         } catch (error) {
             console.error("Error al registrar el usuario:", error.message);
-            alert("Error al registrar el usuario: " + error.message);
+            setErrorMessage("Error al registrar el usuario: " + error.message);
         }
     };
 
@@ -81,7 +83,8 @@ const RegisterForm = () => {
                         required
                     />
                 </div>
-                <button type="submit" onClick={() => navigate("/")}>Register</button>
+                {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+                <button type="submit">Register</button>
             </form>
         </div>
     );
